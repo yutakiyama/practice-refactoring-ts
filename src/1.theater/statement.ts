@@ -1,4 +1,4 @@
-import * as invoices from './invoices.json';
+import * as invoice from './invoice.json';
 import * as plays from './plays.json';
 
 function statement(invoice: any, plays: any) {
@@ -48,4 +48,4 @@ function statement(invoice: any, plays: any) {
   return result;
 }
 
-console.log(statement(invoices, plays));
+console.log(statement(invoice, plays));
