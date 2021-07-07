@@ -1,7 +1,22 @@
 import * as invoice from './invoice.json';
 import * as plays from './plays.json';
 
-function statement(invoice: any, plays: any) {
+interface Performance {
+  playID: string;
+  audience: number;
+}
+
+interface Invoice {
+  customer: string;
+  performances: Performance[];
+}
+
+interface Play {
+  name: string;
+  type: string;
+}
+
+function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
