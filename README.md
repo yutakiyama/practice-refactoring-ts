@@ -1,7 +1,6 @@
 # practice-refactoring-ts
 
-リファクタリング第２版をTypeScript進めてみる
-
+リファクタリング第２版を TypeScript 進めてみる
 
 ## run
 
