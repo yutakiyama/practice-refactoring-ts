@@ -17,6 +17,10 @@ interface Play {
 }
 
 function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
+  function playFor(aPerformance: Performance) {
+    return plays[aPerformance.playID];
+  }
+
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
@@ -28,7 +32,7 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   }).format;
 
   for (const perf of invoice.performances) {
-    const play = plays[perf.playID];
+    const play = playFor(perf);
     const thisAmount = amountFor(perf, play);
 
     // ボリューム特典のポイントを加算
