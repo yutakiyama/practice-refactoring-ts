@@ -17,7 +17,7 @@ interface Play {
 }
 
 function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
-  function playFor(aPerformance: Performance) {
+  function playFor(aPerformance: Performance): Play {
     return plays[aPerformance.playID];
   }
 
@@ -32,7 +32,7 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   }).format;
 
   for (const perf of invoice.performances) {
-    const thisAmount = amountFor(perf, playFor(perf));
+    const thisAmount = amountFor(perf);
 
     // ボリューム特典のポイントを加算
     volumeCredits += Math.max(perf.audience - 30, 0);
@@ -48,9 +48,9 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
 
   return result;
 
-  function amountFor(aPerformance: Performance, play: Play): number {
+  function amountFor(aPerformance: Performance): number {
     let result = 0;
-    switch (play.type) {
+    switch (playFor(aPerformance).type) {
       case 'tragedy':
         result = 40000;
         if (aPerformance.audience > 30) {
@@ -65,11 +65,10 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
         result += 300 * aPerformance.audience;
         break;
       default:
-        throw new Error(`unknown type: ${play.type}`);
+        throw new Error(`unknown type: ${playFor(aPerformance).type}`);
     }
 
     return result;
   }
 }
-
 console.log(statement(invoice, plays));
