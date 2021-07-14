@@ -36,6 +36,15 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return result;
   }
 
+  function totalVolumeCredits() {
+    let result = 0;
+    for (const perf of invoice.performances) {
+      result += volumeCreditsFor(perf);
+    }
+
+    return result;
+  }
+
   let totalAmount = 0;
   let result = `Statement for ${invoice.customer}\n`;
   for (const perf of invoice.performances) {
@@ -44,10 +53,7 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     totalAmount += amountFor(perf);
   }
 
-  let volumeCredits = 0;
-  for (const perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
-  }
+  const volumeCredits: number = totalVolumeCredits();
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
   result += `You earned ${volumeCredits} credits\n`;
