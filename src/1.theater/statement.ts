@@ -17,8 +17,22 @@ interface Play {
 }
 
 function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
-  function playFor(aPerformance: Performance): Play {
-    return plays[aPerformance.playID];
+  function totalAmount() {
+    let result = 0;
+    for (const perf of invoice.performances) {
+      result += amountFor(perf);
+    }
+
+    return result;
+  }
+
+  function totalVolumeCredits() {
+    let result = 0;
+    for (const perf of invoice.performances) {
+      result += volumeCreditsFor(perf);
+    }
+
+    return result;
   }
 
   function usd(aNumber: number) {
@@ -36,35 +50,9 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return result;
   }
 
-  function totalVolumeCredits() {
-    let result = 0;
-    for (const perf of invoice.performances) {
-      result += volumeCreditsFor(perf);
-    }
-
-    return result;
+  function playFor(aPerformance: Performance): Play {
+    return plays[aPerformance.playID];
   }
-
-  function totalAmount() {
-    let result = 0;
-    for (const perf of invoice.performances) {
-      result += amountFor(perf);
-    }
-
-    return result;
-  }
-
-  let result = `Statement for ${invoice.customer}\n`;
-
-  for (const perf of invoice.performances) {
-    // 注文の内訳を出力
-    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
-  }
-
-  result += `Amount owed is ${usd(totalAmount())}\n`;
-  result += `You earned ${totalVolumeCredits()} credits\n`;
-
-  return result;
 
   function amountFor(aPerformance: Performance): number {
     let result = 0;
@@ -88,6 +76,18 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
 
     return result;
   }
+
+  let result = `Statement for ${invoice.customer}\n`;
+
+  for (const perf of invoice.performances) {
+    // 注文の内訳を出力
+    result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
+  }
+
+  result += `Amount owed is ${usd(totalAmount())}\n`;
+  result += `You earned ${totalVolumeCredits()} credits\n`;
+
+  return result;
 }
 
 console.log(statement(invoice, plays));
