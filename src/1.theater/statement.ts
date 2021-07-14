@@ -45,12 +45,21 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return result;
   }
 
-  let totalAmount = 0;
+  function appleSource() {
+    let totalAmount = 0;
+    for (const perf of invoice.performances) {
+      totalAmount += amountFor(perf);
+    }
+
+    return totalAmount;
+  }
+
   let result = `Statement for ${invoice.customer}\n`;
+
+  const totalAmount = appleSource();
   for (const perf of invoice.performances) {
     // 注文の内訳を出力
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
-    totalAmount += amountFor(perf);
   }
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
