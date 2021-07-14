@@ -16,25 +16,20 @@ interface Play {
   type: string;
 }
 
-interface StatementData {
-  customer: string;
-}
+type StatementData = Invoice;
 
 function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   const statementData: StatementData = {
     customer: invoice.customer,
+    performances: invoice.performances,
   };
-  return renderPlainText(statementData, invoice, plays);
+  return renderPlainText(statementData, plays);
 }
 
-function renderPlainText(
-  statement: StatementData,
-  invoice: Invoice,
-  plays: { [playID: string]: Play }
-) {
+function renderPlainText(data: StatementData, plays: { [playID: string]: Play }) {
   function totalAmount() {
     let result = 0;
-    for (const perf of invoice.performances) {
+    for (const perf of data.performances) {
       result += amountFor(perf);
     }
 
@@ -43,7 +38,7 @@ function renderPlainText(
 
   function totalVolumeCredits() {
     let result = 0;
-    for (const perf of invoice.performances) {
+    for (const perf of data.performances) {
       result += volumeCreditsFor(perf);
     }
 
@@ -92,9 +87,9 @@ function renderPlainText(
     return result;
   }
 
-  let result = `Statement for ${statement.customer}\n`;
+  let result = `Statement for ${data.customer}\n`;
 
-  for (const perf of invoice.performances) {
+  for (const perf of data.performances) {
     // 注文の内訳を出力
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
