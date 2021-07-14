@@ -5,5 +5,5 @@
 ts-node-devで動かす
 
 ```bash
-ts-node-dev --respawn statement.ts
+npx ts-node-dev --respawn statement.ts
 ```
