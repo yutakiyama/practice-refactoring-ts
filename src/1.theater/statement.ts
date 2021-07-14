@@ -1,14 +1,14 @@
 import * as invoice from './invoice.json';
 import * as plays from './plays.json';
 
-interface Performance {
+interface PerformanceRecord {
   playID: string;
   audience: number;
 }
 
-interface Invoice {
+interface InvoiceRecord {
   customer: string;
-  performances: Performance[];
+  performances: PerformanceRecord[];
 }
 
 interface Play {
@@ -16,14 +16,30 @@ interface Play {
   type: string;
 }
 
-type StatementData = Invoice;
+type Performance = PerformanceRecord & {
+  play: Play;
+};
 
-function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
+type StatementData = {
+  customer: string;
+  performances: Performance[];
+};
+
+function statement(invoice: InvoiceRecord, plays: { [playID: string]: Play }) {
   const statementData: StatementData = {
     customer: invoice.customer,
-    performances: invoice.performances,
+    performances: invoice.performances.map(enrichPerformance),
   };
   return renderPlainText(statementData, plays);
+
+  function enrichPerformance(aPerformance: PerformanceRecord): Performance {
+    const result: Performance = { ...aPerformance, play: playFor(aPerformance) };
+    return result;
+  }
+
+  function playFor(aPerformance: PerformanceRecord): Play {
+    return plays[aPerformance.playID];
+  }
 }
 
 function renderPlainText(data: StatementData, plays: { [playID: string]: Play }) {
@@ -53,18 +69,18 @@ function renderPlainText(data: StatementData, plays: { [playID: string]: Play })
     }).format(aNumber / 100);
   }
 
-  function volumeCreditsFor(aPerformance: Performance) {
+  function volumeCreditsFor(aPerformance: PerformanceRecord) {
     let result = 0;
     result += Math.max(aPerformance.audience - 30, 0);
     if ('comedy' === playFor(aPerformance).type) result += Math.floor(aPerformance.audience / 5);
     return result;
   }
 
-  function playFor(aPerformance: Performance): Play {
+  function playFor(aPerformance: PerformanceRecord): Play {
     return plays[aPerformance.playID];
   }
 
-  function amountFor(aPerformance: Performance): number {
+  function amountFor(aPerformance: PerformanceRecord): number {
     let result = 0;
     switch (playFor(aPerformance).type) {
       case 'tragedy':
