@@ -45,7 +45,7 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return result;
   }
 
-  function appleSource() {
+  function totalAmount() {
     let totalAmount = 0;
     for (const perf of invoice.performances) {
       totalAmount += amountFor(perf);
@@ -56,13 +56,12 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
 
   let result = `Statement for ${invoice.customer}\n`;
 
-  const totalAmount = appleSource();
   for (const perf of invoice.performances) {
     // 注文の内訳を出力
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
   }
 
-  result += `Amount owed is ${usd(totalAmount)}\n`;
+  result += `Amount owed is ${usd(totalAmount())}\n`;
   result += `You earned ${totalVolumeCredits()} credits\n`;
 
   return result;
