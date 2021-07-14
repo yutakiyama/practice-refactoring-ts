@@ -21,11 +21,11 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return plays[aPerformance.playID];
   }
 
-  function volumeCreditsFor(perf: Performance) {
-    let volumeCredits = 0;
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    if ('comedy' === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
-    return volumeCredits;
+  function volumeCreditsFor(aPerformance: Performance) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if ('comedy' === playFor(aPerformance).type) result += Math.floor(aPerformance.audience / 5);
+    return result;
   }
 
   let totalAmount = 0;
