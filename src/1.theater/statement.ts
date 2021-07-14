@@ -17,6 +17,10 @@ interface Play {
 }
 
 function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
+  return renderPlainText(invoice, plays);
+}
+
+function renderPlainText(invoice: Invoice, plays: { [playID: string]: Play }) {
   function totalAmount() {
     let result = 0;
     for (const perf of invoice.performances) {
