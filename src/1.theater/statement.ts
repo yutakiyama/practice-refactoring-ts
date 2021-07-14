@@ -21,6 +21,14 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     return plays[aPerformance.playID];
   }
 
+  function format(aNumber: number) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+    }).format;
+  }
+
   function volumeCreditsFor(aPerformance: Performance) {
     let result = 0;
     result += Math.max(aPerformance.audience - 30, 0);
@@ -31,12 +39,6 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   let totalAmount = 0;
   let volumeCredits = 0;
   let result = `Statement for ${invoice.customer}\n`;
-
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
 
   for (const perf of invoice.performances) {
     volumeCredits += volumeCreditsFor(perf);
