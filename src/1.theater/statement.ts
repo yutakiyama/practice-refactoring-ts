@@ -41,11 +41,13 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   let result = `Statement for ${invoice.customer}\n`;
 
   for (const perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf);
-
     // 注文の内訳を出力
     result += ` ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`;
     totalAmount += amountFor(perf);
+  }
+
+  for (const perf of invoice.performances) {
+    volumeCredits += volumeCreditsFor(perf);
   }
 
   result += `Amount owed is ${usd(totalAmount)}\n`;
