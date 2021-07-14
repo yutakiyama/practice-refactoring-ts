@@ -16,12 +16,22 @@ interface Play {
   type: string;
 }
 
-function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
-  const statementData = {};
-  return renderPlainText(statement, invoice, plays);
+interface StatementData {
+  customer: string;
 }
 
-function renderPlainText(statement: any, invoice: Invoice, plays: { [playID: string]: Play }) {
+function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
+  const statementData: StatementData = {
+    customer: invoice.customer,
+  };
+  return renderPlainText(statementData, invoice, plays);
+}
+
+function renderPlainText(
+  statement: StatementData,
+  invoice: Invoice,
+  plays: { [playID: string]: Play }
+) {
   function totalAmount() {
     let result = 0;
     for (const perf of invoice.performances) {
@@ -82,7 +92,7 @@ function renderPlainText(statement: any, invoice: Invoice, plays: { [playID: str
     return result;
   }
 
-  let result = `Statement for ${invoice.customer}\n`;
+  let result = `Statement for ${statement.customer}\n`;
 
   for (const perf of invoice.performances) {
     // 注文の内訳を出力
