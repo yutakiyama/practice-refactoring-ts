@@ -46,12 +46,12 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
   }
 
   function totalAmount() {
-    let totalAmount = 0;
+    let result = 0;
     for (const perf of invoice.performances) {
-      totalAmount += amountFor(perf);
+      result += amountFor(perf);
     }
 
-    return totalAmount;
+    return result;
   }
 
   let result = `Statement for ${invoice.customer}\n`;
