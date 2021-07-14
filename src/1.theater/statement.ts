@@ -53,10 +53,8 @@ function statement(invoice: Invoice, plays: { [playID: string]: Play }) {
     totalAmount += amountFor(perf);
   }
 
-  const volumeCredits: number = totalVolumeCredits();
-
   result += `Amount owed is ${usd(totalAmount)}\n`;
-  result += `You earned ${volumeCredits} credits\n`;
+  result += `You earned ${totalVolumeCredits()} credits\n`;
 
   return result;
 
