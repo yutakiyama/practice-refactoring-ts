@@ -1,51 +1,115 @@
-import * as invoices from './invoices.json';
+import * as invoice from './invoice.json';
 import * as plays from './plays.json';
 
-function statement(invoice: any, plays: any) {
-  let totalAmount = 0;
-  let volumeCredits = 0;
-  let result = `Statement for ${invoice.customer}\n`;
+interface PerformanceRecord {
+  playID: string;
+  audience: number;
+}
 
-  const format = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format;
+interface InvoiceRecord {
+  customer: string;
+  performances: PerformanceRecord[];
+}
 
-  for (const perf of invoice.performances) {
-    const play = plays[perf.playID];
-    let thisAmount = 0;
+interface Play {
+  name: string;
+  type: string;
+}
 
+type Performance = PerformanceRecord & {
+  play: Play;
+  amount: number;
+  volumeCredits: number;
+};
+
+type StatementData = {
+  customer: string;
+  performances: Performance[];
+  totalAmount: number;
+  totalVolumeCredits: number;
+};
+
+function statement(invoice: InvoiceRecord, plays: { [playID: string]: Play }) {
+  const performances = invoice.performances.map(enrichPerformance);
+  const statementData: StatementData = {
+    customer: invoice.customer,
+    performances: performances,
+    totalAmount: getTotalAmount(performances),
+    totalVolumeCredits: getTotalVolumeCredits(performances),
+  };
+  return renderPlainText(statementData);
+
+  function enrichPerformance(aPerformance: PerformanceRecord): Performance {
+    const play = playFor(aPerformance);
+    const amount = amountFor(aPerformance, play);
+    const volumeCredits = volumeCreditsFor(aPerformance, play);
+
+    return { ...aPerformance, play, amount, volumeCredits };
+  }
+
+  function playFor(aPerformance: PerformanceRecord): Play {
+    return plays[aPerformance.playID];
+  }
+
+  function amountFor(aPerformance: PerformanceRecord, play: Play): number {
+    let result = 0;
     switch (play.type) {
       case 'tragedy':
-        thisAmount = 40000;
-        if (perf.audience > 30) {
-          thisAmount += 1000 * (perf.audience - 30);
+        result = 40000;
+        if (aPerformance.audience > 30) {
+          result += 1000 * (aPerformance.audience - 30);
         }
         break;
       case 'comedy':
-        thisAmount = 30000;
-        if (perf.audience > 20) {
-          thisAmount += 10000 + 500 * (perf.audience - 20);
+        result = 30000;
+        if (aPerformance.audience > 20) {
+          result += 10000 + 500 * (aPerformance.audience - 20);
         }
-        thisAmount += 300 * perf.audience;
+        result += 300 * aPerformance.audience;
         break;
       default:
         throw new Error(`unknown type: ${play.type}`);
     }
 
-    // ボリューム特典のポイントを加算
-    volumeCredits += Math.max(perf.audience - 30, 0);
-    // 喜劇のときは10人につき、さらにポイントを加算
-    if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5);
-    // 注文の内訳を出力
-    result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
-    totalAmount += thisAmount;
+    return result;
   }
 
-  result += `Amount owed is ${format(totalAmount / 100)}\n`;
-  result += `You earned ${volumeCredits} credits\n`;
+  function volumeCreditsFor(aPerformance: PerformanceRecord, play: Play) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if ('comedy' === play.type) result += Math.floor(aPerformance.audience / 5);
+    return result;
+  }
+
+  function getTotalAmount(data: Performance[]) {
+    return data.reduce((total, p) => total + p.amount, 0);
+  }
+
+  function getTotalVolumeCredits(data: Performance[]) {
+    return data.reduce((total, p) => total + p.volumeCredits, 0);
+  }
+}
+
+function renderPlainText(data: StatementData) {
+  let result = `Statement for ${data.customer}\n`;
+
+  for (const perf of data.performances) {
+    // 注文の内訳を出力
+    result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n`;
+  }
+
+  result += `Amount owed is ${usd(data.totalAmount)}\n`;
+  result += `You earned ${data.totalVolumeCredits} credits\n`;
+
   return result;
 }
 
-console.log(statement(invoices, plays));
+function usd(aNumber: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format(aNumber / 100);
+}
+
+console.log(statement(invoice, plays));

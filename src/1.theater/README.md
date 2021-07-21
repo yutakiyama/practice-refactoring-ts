@@ -2,7 +2,8 @@
 
 ## run
 
+ts-node-devで動かす
+
 ```bash
-cd path/to/src/1.theater/
-npx ts-node-dev statement.ts
+npx ts-node-dev --respawn statement.ts
 ```
