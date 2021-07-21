@@ -47,6 +47,10 @@ class PerformanceCalculator {
   }
 }
 
+function createPerformanceCalculator(aPerformance: PerformanceRecord, aPlay: Play) {
+  return new PerformanceCalculator(aPerformance, aPlay);
+}
+
 export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
   const performances = invoice.performances.map(enrichPerformance);
   return {
@@ -56,7 +60,7 @@ export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord):
     totalVolumeCredits: getTotalVolumeCredits(performances),
   };
   function enrichPerformance(aPerformance: PerformanceRecord): Performance {
-    const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
+    const calculator = createPerformanceCalculator(aPerformance, playFor(aPerformance));
     const play = calculator.play;
     const amount = calculator.amount;
     const volumeCredits = calculator.volumeCredits;
