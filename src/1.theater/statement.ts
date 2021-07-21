@@ -19,6 +19,7 @@ interface Play {
 type Performance = PerformanceRecord & {
   play: Play;
   amount: number;
+  volumeCredits: number;
 };
 
 type StatementData = {
@@ -36,7 +37,8 @@ function statement(invoice: InvoiceRecord, plays: { [playID: string]: Play }) {
   function enrichPerformance(aPerformance: PerformanceRecord): Performance {
     const play = playFor(aPerformance);
     const amount = amountFor(aPerformance, play);
-    return { ...aPerformance, play, amount };
+    const volumeCredits = volumeCreditsFor(aPerformance, play);
+    return { ...aPerformance, play, amount, volumeCredits };
   }
 
   function playFor(aPerformance: PerformanceRecord): Play {
@@ -65,6 +67,13 @@ function statement(invoice: InvoiceRecord, plays: { [playID: string]: Play }) {
 
     return result;
   }
+
+  function volumeCreditsFor(aPerformance: PerformanceRecord, play: Play) {
+    let result = 0;
+    result += Math.max(aPerformance.audience - 30, 0);
+    if ('comedy' === play.type) result += Math.floor(aPerformance.audience / 5);
+    return result;
+  }
 }
 
 function renderPlainText(data: StatementData) {
@@ -80,7 +89,7 @@ function renderPlainText(data: StatementData) {
   function totalVolumeCredits() {
     let result = 0;
     for (const perf of data.performances) {
-      result += volumeCreditsFor(perf);
+      result += perf.volumeCredits;
     }
 
     return result;
@@ -92,13 +101,6 @@ function renderPlainText(data: StatementData) {
       currency: 'USD',
       minimumFractionDigits: 2,
     }).format(aNumber / 100);
-  }
-
-  function volumeCreditsFor(aPerformance: Performance) {
-    let result = 0;
-    result += Math.max(aPerformance.audience - 30, 0);
-    if ('comedy' === aPerformance.play.type) result += Math.floor(aPerformance.audience / 5);
-    return result;
   }
 
   let result = `Statement for ${data.customer}\n`;
