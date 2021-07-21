@@ -7,6 +7,16 @@ import {
   StatementData,
 } from './types';
 
+class PerformanceCalculator {
+  performance: PerformanceRecord;
+  play: Play;
+
+  constructor(aPerformance: PerformanceRecord, aPlay: Play) {
+    this.performance = aPerformance;
+    this.play = aPlay;
+  }
+}
+
 export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
   const performances = invoice.performances.map(enrichPerformance);
   return {
@@ -16,7 +26,8 @@ export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord):
     totalVolumeCredits: getTotalVolumeCredits(performances),
   };
   function enrichPerformance(aPerformance: PerformanceRecord): Performance {
-    const play = playFor(aPerformance);
+    const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
+    const play = calculator.play;
     const amount = amountFor(aPerformance, play);
     const volumeCredits = volumeCreditsFor(aPerformance, play);
 
