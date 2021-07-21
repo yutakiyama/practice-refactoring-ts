@@ -38,6 +38,13 @@ class PerformanceCalculator {
 
     return result;
   }
+
+  get volumeCredits() {
+    let result = 0;
+    result += Math.max(this.performance.audience - 30, 0);
+    if ('comedy' === this.play.type) result += Math.floor(this.performance.audience / 5);
+    return result;
+  }
 }
 
 export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
@@ -52,20 +59,13 @@ export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord):
     const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
     const play = calculator.play;
     const amount = calculator.amount;
-    const volumeCredits = volumeCreditsFor(aPerformance, play);
+    const volumeCredits = calculator.volumeCredits;
 
     return { ...aPerformance, play, amount, volumeCredits };
   }
 
   function playFor(aPerformance: PerformanceRecord): Play {
     return plays[aPerformance.playID];
-  }
-
-  function volumeCreditsFor(aPerformance: PerformanceRecord, play: Play) {
-    let result = 0;
-    result += Math.max(aPerformance.audience - 30, 0);
-    if ('comedy' === play.type) result += Math.floor(aPerformance.audience / 5);
-    return result;
   }
 
   function getTotalAmount(data: Performance[]) {
