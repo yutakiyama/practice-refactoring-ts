@@ -13,7 +13,7 @@ export type Play = {
   type: PlayType;
 };
 
-type PlayType = 'tragedy' | 'comedy';
+type PlayType = string;
 
 export type PlaysRecord = { [playID: string]: Play };
 
