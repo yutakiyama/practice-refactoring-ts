@@ -51,7 +51,7 @@ export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord):
   function enrichPerformance(aPerformance: PerformanceRecord): Performance {
     const calculator = new PerformanceCalculator(aPerformance, playFor(aPerformance));
     const play = calculator.play;
-    const amount = amountFor(aPerformance, play);
+    const amount = calculator.amount;
     const volumeCredits = volumeCreditsFor(aPerformance, play);
 
     return { ...aPerformance, play, amount, volumeCredits };
@@ -59,10 +59,6 @@ export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord):
 
   function playFor(aPerformance: PerformanceRecord): Play {
     return plays[aPerformance.playID];
-  }
-
-  function amountFor(aPerformance: PerformanceRecord, play: Play): number {
-    return new PerformanceCalculator(aPerformance, play).amount;
   }
 
   function volumeCreditsFor(aPerformance: PerformanceRecord, play: Play) {
