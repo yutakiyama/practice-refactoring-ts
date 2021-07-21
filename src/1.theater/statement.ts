@@ -16,6 +16,8 @@ interface Play {
   type: string;
 }
 
+type PlaysRecord = { [playID: string]: Play };
+
 type Performance = PerformanceRecord & {
   play: Play;
   amount: number;
@@ -29,16 +31,18 @@ type StatementData = {
   totalVolumeCredits: number;
 };
 
-function statement(invoice: InvoiceRecord, plays: { [playID: string]: Play }) {
+function statement(invoice: InvoiceRecord, plays: PlaysRecord) {
+  return renderPlainText(createStatementData(invoice, plays));
+}
+
+function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
   const performances = invoice.performances.map(enrichPerformance);
-  const statementData: StatementData = {
+  return {
     customer: invoice.customer,
     performances: performances,
     totalAmount: getTotalAmount(performances),
     totalVolumeCredits: getTotalVolumeCredits(performances),
   };
-  return renderPlainText(statementData);
-
   function enrichPerformance(aPerformance: PerformanceRecord): Performance {
     const play = playFor(aPerformance);
     const amount = amountFor(aPerformance, play);
