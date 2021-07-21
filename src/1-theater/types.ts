@@ -10,8 +10,10 @@ export type InvoiceRecord = {
 
 export type Play = {
   name: string;
-  type: string;
+  type: PlayType;
 };
+
+type PlayType = 'tragedy' | 'comedy';
 
 export type PlaysRecord = { [playID: string]: Play };
 
