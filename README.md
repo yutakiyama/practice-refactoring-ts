@@ -1,9 +1,13 @@
 # practice-refactoring-ts
 
-リファクタリング第２版を TypeScript 進めてみる
+リファクタリング第２版を TypeScript で進めてみる
 
-## run
+## 1. 劇団会社の請求処理
+
+## how to run
+
+ts-node-devで動かいている
 
 ```bash
-npm run dev
+npm run dev:theater
 ```
