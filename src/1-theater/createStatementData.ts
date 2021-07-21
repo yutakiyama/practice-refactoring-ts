@@ -1,41 +1,13 @@
-import * as invoice from './invoice.json';
-import * as plays from './plays.json';
+import {
+  InvoiceRecord,
+  Performance,
+  PerformanceRecord,
+  Play,
+  PlaysRecord,
+  StatementData,
+} from './types';
 
-interface PerformanceRecord {
-  playID: string;
-  audience: number;
-}
-
-interface InvoiceRecord {
-  customer: string;
-  performances: PerformanceRecord[];
-}
-
-interface Play {
-  name: string;
-  type: string;
-}
-
-type PlaysRecord = { [playID: string]: Play };
-
-type Performance = PerformanceRecord & {
-  play: Play;
-  amount: number;
-  volumeCredits: number;
-};
-
-type StatementData = {
-  customer: string;
-  performances: Performance[];
-  totalAmount: number;
-  totalVolumeCredits: number;
-};
-
-function statement(invoice: InvoiceRecord, plays: PlaysRecord) {
-  return renderPlainText(createStatementData(invoice, plays));
-}
-
-function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
+export function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): StatementData {
   const performances = invoice.performances.map(enrichPerformance);
   return {
     customer: invoice.customer,
@@ -93,27 +65,3 @@ function createStatementData(invoice: InvoiceRecord, plays: PlaysRecord): Statem
     return data.reduce((total, p) => total + p.volumeCredits, 0);
   }
 }
-
-function renderPlainText(data: StatementData) {
-  let result = `Statement for ${data.customer}\n`;
-
-  for (const perf of data.performances) {
-    // 注文の内訳を出力
-    result += ` ${perf.play.name}: ${usd(perf.amount)} (${perf.audience} seats)\n`;
-  }
-
-  result += `Amount owed is ${usd(data.totalAmount)}\n`;
-  result += `You earned ${data.totalVolumeCredits} credits\n`;
-
-  return result;
-}
-
-function usd(aNumber: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-  }).format(aNumber / 100);
-}
-
-console.log(statement(invoice, plays));
