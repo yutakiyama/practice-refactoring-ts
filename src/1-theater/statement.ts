@@ -1,9 +1,7 @@
-import * as invoice from './invoice.json';
-import * as plays from './plays.json';
 import { InvoiceRecord, PlaysRecord, StatementData } from './types';
 import { createStatementData } from './createStatementData';
 
-function statement(invoice: InvoiceRecord, plays: PlaysRecord) {
+export function statement(invoice: InvoiceRecord, plays: PlaysRecord): string {
   return renderPlainText(createStatementData(invoice, plays));
 }
 
@@ -21,7 +19,7 @@ function renderPlainText(data: StatementData) {
   return result;
 }
 
-function htmlStatement(invoice: InvoiceRecord, plays: PlaysRecord) {
+export function htmlStatement(invoice: InvoiceRecord, plays: PlaysRecord): string {
   return renderHtml(createStatementData(invoice, plays));
 }
 
@@ -46,6 +44,3 @@ function usd(aNumber: number) {
     minimumFractionDigits: 2,
   }).format(aNumber / 100);
 }
-
-console.log(statement(invoice, plays));
-console.log(htmlStatement(invoice, plays));
